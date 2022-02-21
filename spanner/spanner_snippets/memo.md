@@ -1,6 +1,6 @@
 - [x] create database
 - [x] insert data
-- [ ] query data
+- [x] query data
 - [ ] read data
 - [ ] add column
 - [ ] update data

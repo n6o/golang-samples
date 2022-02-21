@@ -140,22 +140,31 @@ func write(ctx context.Context, w io.Writer, client *spanner.Client) error {
 // [START spanner_query_data]
 
 func query(ctx context.Context, w io.Writer, client *spanner.Client) error {
+	// statement 作成
 	stmt := spanner.Statement{SQL: `SELECT SingerId, AlbumId, AlbumTitle FROM Albums`}
+	// Single: *ReadOnlyTransaction を返す
 	iter := client.Single().Query(ctx, stmt)
+	// イテレータは必ず止める
 	defer iter.Stop()
 	for {
 		row, err := iter.Next()
+		// Done って error 型だったんだ
+		// というか、変数名からしてそりゃそうなのか
 		if err == iterator.Done {
 			return nil
 		}
 		if err != nil {
 			return err
 		}
+		// こう宣言した際、 singerID は int64 型の変数で、そのポインタは &singerID で取れる。
+		// &singerID は int64 へのポインタ 型である。
 		var singerID, albumID int64
 		var albumTitle string
+		// この渡した変数に値を設定するやりかた、慣れないと
 		if err := row.Columns(&singerID, &albumID, &albumTitle); err != nil {
 			return err
 		}
+		// Writer はこれで使うために入れてたのか
 		fmt.Fprintf(w, "%d %d %s\n", singerID, albumID, albumTitle)
 	}
 }
