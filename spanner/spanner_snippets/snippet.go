@@ -218,6 +218,8 @@ func read(ctx context.Context, w io.Writer, client *spanner.Client) error {
 // [START spanner_add_column]
 
 func addNewColumn(ctx context.Context, w io.Writer, adminClient *database.DatabaseAdminClient, database string) error {
+	// 指定したDBで指定したDDL statementを実行する、の意
+	// ALTER なら何でもできるのだろうか
 	op, err := adminClient.UpdateDatabaseDdl(ctx, &adminpb.UpdateDatabaseDdlRequest{
 		Database: database,
 		Statements: []string{

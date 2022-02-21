@@ -2,7 +2,7 @@
 - [x] insert data
 - [x] query data
 - [x] read data
-- [ ] add column
+- [x] add column
 - [ ] update data
 - [ ] query data with new column
 - [ ] read data with index
