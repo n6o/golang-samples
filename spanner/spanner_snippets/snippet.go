@@ -174,6 +174,25 @@ func query(ctx context.Context, w io.Writer, client *spanner.Client) error {
 // [START spanner_read_data]
 
 func read(ctx context.Context, w io.Writer, client *spanner.Client) error {
+	// でた。Read。なんだこれ。
+	// https://cloud.google.com/spanner/docs/reads#perform-strong-read
+	// 強力な読み取りってなんのこっちゃ
+	// (Java版のコードに書いてあったんだけど) KeySet.all(), // Read all rows in a table.
+
+	// トランザクションを必要としない読み取り？
+	// Strong Read:　読み取り処理の開始時までにコミットされたデータを確実に読み出せる。 spanner のデフォルト。
+	// https://image.slidesharecdn.com/gke02-200121091040/95/gke-spanner-cloud-spanner-26-638.jpg?cb=1579599982
+
+	// 公式ドキュメントだと下記のあたりに Strong Read / Stale Read の定義が書いてありそう
+	// https://cloud.google.com/spanner/docs/timestamp-bounds#timestamp_bound_types
+
+	// Stale Read:
+	// Strong Read だと ReadWrite レプリカにアクセスするみたい。
+	// https://medium.com/google-cloud-jp/cloud-spanner-%E3%81%AE%E3%83%8F%E3%82%A4%E3%83%AC%E3%83%99%E3%83%AB%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E8%A7%A3%E8%AA%AC-fee62c17f7ed
+
+	// 結局 Stale Read のユースケースがよくわかっていない。近いところから読み取れるからレイテンシを低くしたいときに使うのかな
+	// 15秒以上前のデータで事が済む場合は、 Stale Read を使うとシュッと取れると。
+	// 時系列データを遡るときとかかなぁ
 	iter := client.Single().Read(ctx, "Albums", spanner.AllKeys(),
 		[]string{"SingerId", "AlbumId", "AlbumTitle"})
 	defer iter.Stop()
