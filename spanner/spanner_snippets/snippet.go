@@ -273,6 +273,8 @@ func queryNewColumn(ctx context.Context, w io.Writer, client *spanner.Client) er
 		}
 		var singerID, albumID int64
 		var marketingBudget spanner.NullInt64
+		// ColumnByName なんだこれ
+		// 冗長だけどわかりやすくかけそう
 		if err := row.ColumnByName("SingerId", &singerID); err != nil {
 			return err
 		}
@@ -282,8 +284,12 @@ func queryNewColumn(ctx context.Context, w io.Writer, client *spanner.Client) er
 		if err := row.ColumnByName("MarketingBudget", &marketingBudget); err != nil {
 			return err
 		}
+		// なんだこれ
 		budget := "NULL"
+		// marketingBudget は NullInt64 型
+		// NullInt64: Nullでないとき Valid = true
 		if marketingBudget.Valid {
+			// なるほディウス
 			budget = strconv.FormatInt(marketingBudget.Int64, 10)
 		}
 		fmt.Fprintf(w, "%d %d %s\n", singerID, albumID, budget)
