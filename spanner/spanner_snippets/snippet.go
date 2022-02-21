@@ -112,9 +112,12 @@ func createDatabase(ctx context.Context, w io.Writer, adminClient *database.Data
 // [START spanner_insert_data]
 
 func write(ctx context.Context, w io.Writer, client *spanner.Client) error {
+	// 各テーブルのカラムのスライスを用意する
 	singerColumns := []string{"SingerId", "FirstName", "LastName"}
 	albumColumns := []string{"SingerId", "AlbumId", "AlbumTitle"}
+	// mutation だ。基本は mutation なのかな
 	m := []*spanner.Mutation{
+		// InsertOrUpdate: テーブル名, カラム名, 設定する値
 		spanner.InsertOrUpdate("Singers", singerColumns, []interface{}{1, "Marc", "Richards"}),
 		spanner.InsertOrUpdate("Singers", singerColumns, []interface{}{2, "Catalina", "Smith"}),
 		spanner.InsertOrUpdate("Singers", singerColumns, []interface{}{3, "Alice", "Trentor"}),
@@ -126,6 +129,8 @@ func write(ctx context.Context, w io.Writer, client *spanner.Client) error {
 		spanner.InsertOrUpdate("Albums", albumColumns, []interface{}{2, 2, "Forever Hold Your Peace"}),
 		spanner.InsertOrUpdate("Albums", albumColumns, []interface{}{2, 3, "Terrified"}),
 	}
+	// オプションの使い方知りたいのに、、、
+	// ApplyOption: *applyOption を引数に取る関数だった
 	_, err := client.Apply(ctx, m)
 	return err
 }

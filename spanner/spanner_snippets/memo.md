@@ -1,5 +1,5 @@
 - [x] create database
-- [ ] insert data
+- [x] insert data
 - [ ] query data
 - [ ] read data
 - [ ] add column
