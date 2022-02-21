@@ -3,7 +3,7 @@
 - [x] query data
 - [x] read data
 - [x] add column
-- [ ] update data
+- [x] update data
 - [ ] query data with new column
 - [ ] read data with index
 - [ ] create storing index

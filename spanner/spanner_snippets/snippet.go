@@ -241,6 +241,12 @@ func addNewColumn(ctx context.Context, w io.Writer, adminClient *database.Databa
 // [START spanner_update_data]
 
 func update(ctx context.Context, w io.Writer, client *spanner.Client) error {
+	// [Q] 存在しないレコードに対して mutation したらどうなるんだろう
+	//     upsert できるっぽい。すごい。
+	//     https://cloud.google.com/spanner/docs/dml-versus-mutations#feature_comparison_between_dml_and_mutations
+	// [Q] あと、対象が特定できない mutation って作れるのだろうか
+	//     Delete だとできるっぽい。 mutation でもやりようはあるっぽいな
+	//     https://cloud.google.com/spanner/docs/modify-mutation-api
 	cols := []string{"SingerId", "AlbumId", "MarketingBudget"}
 	_, err := client.Apply(ctx, []*spanner.Mutation{
 		spanner.Update("Albums", cols, []interface{}{1, 1, 100000}),
