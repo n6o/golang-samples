@@ -33,9 +33,13 @@ import (
 	adminpb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 )
 
+// command 型定義: Writer と spanner client を受け取って error を返す関数
 type command func(ctx context.Context, w io.Writer, client *spanner.Client) error
+
+// adminCommand 型定義: Writer と admin client と db 文字列を受け取って error を返す関数
 type adminCommand func(ctx context.Context, w io.Writer, adminClient *database.DatabaseAdminClient, database string) error
 
+// 全部で14個のコマンド（スニペット）が書いてある
 var (
 	commands = map[string]command{
 		"write":               write,
@@ -61,13 +65,20 @@ var (
 // [START spanner_create_database]
 
 func createDatabase(ctx context.Context, w io.Writer, adminClient *database.DatabaseAdminClient, db string) error {
+	// FindStringSubmatch
+	// https://pkg.go.dev/regexp#Regexp.FindStringSubmatch
+	// マッチした文字列全体と、マッチしたパターンが含まれたスライスを返す
+	// 下記では /databases/ で分割された文字列がマッチする
 	matches := regexp.MustCompile("^(.*)/databases/(.*)$").FindStringSubmatch(db)
 	if matches == nil || len(matches) != 3 {
+		// マッチしなかった、もしくはマッチが想定外？
+		// [Q] 個数が3じゃないケースってどんな場合だろう。もしもに備えての防御的なコードかな。
 		return fmt.Errorf("Invalid database id %s", db)
 	}
 	op, err := adminClient.CreateDatabase(ctx, &adminpb.CreateDatabaseRequest{
-		Parent:          matches[1],
-		CreateStatement: "CREATE DATABASE `" + matches[2] + "`",
+		Parent:          matches[1],                             // インスタンス関連の情報のはず
+		CreateStatement: "CREATE DATABASE `" + matches[2] + "`", // データベース名のはず
+		// 文字列リテラルもこうやって書いていいんだ
 		ExtraStatements: []string{
 			`CREATE TABLE Singers (
 				SingerId   INT64 NOT NULL,
@@ -86,6 +97,9 @@ func createDatabase(ctx context.Context, w io.Writer, adminClient *database.Data
 	if err != nil {
 		return err
 	}
+	// op CreateDatabaseOperation
+	// [Q] Wait って作り終えるまで待ってくれるのかな
+	//     gax が使われてた
 	if _, err := op.Wait(ctx); err != nil {
 		return err
 	}
