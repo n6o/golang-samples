@@ -6,7 +6,7 @@
 - [x] update data
 - [x] query data with new column
 - [x] read data with index
-- [ ] create storing index
+- [x] create storing index
 - [ ] read data with storing index
 - [ ] read only transaction
 - [ ] DML getting started insert

@@ -339,6 +339,8 @@ func readUsingIndex(ctx context.Context, w io.Writer, client *spanner.Client) er
 // [START spanner_create_storing_index]
 
 func addStoringIndex(ctx context.Context, w io.Writer, adminClient *database.DatabaseAdminClient, database string) error {
+	// MarketingBudget カラムをインデックスにストアする
+	// いつも strong と見間違える、、、
 	op, err := adminClient.UpdateDatabaseDdl(ctx, &adminpb.UpdateDatabaseDdlRequest{
 		Database: database,
 		Statements: []string{
