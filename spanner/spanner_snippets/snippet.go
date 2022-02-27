@@ -508,8 +508,11 @@ func queryWithParameter(ctx context.Context, w io.Writer, client *spanner.Client
 func writeWithTransactionUsingDML(ctx context.Context, w io.Writer, client *spanner.Client) error {
 	_, err := client.ReadWriteTransaction(ctx, func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
 		// getBudget returns the budget for a record with a given albumId and singerId.
+		// 指定したAlbumIDとSingerIDを持つレコードのbudgetを取得するクエリ
 		getBudget := func(albumID, singerID int64) (int64, error) {
+			// WHERE 句的なやつ
 			key := spanner.Key{albumID, singerID}
+			// 1行だけ取れるみたい
 			row, err := txn.ReadRow(ctx, "Albums", key, []string{"MarketingBudget"})
 			if err != nil {
 				return 0, err
@@ -521,6 +524,7 @@ func writeWithTransactionUsingDML(ctx context.Context, w io.Writer, client *span
 			return budget, nil
 		}
 		// updateBudget updates the budget for a record with a given albumId and singerId.
+		// 指定したAlbumIDとSingerIDを持つレコードのbudgetを更新するクエリ
 		updateBudget := func(singerID, albumID, albumBudget int64) error {
 			stmt := spanner.Statement{
 				SQL: `UPDATE Albums
@@ -538,7 +542,9 @@ func writeWithTransactionUsingDML(ctx context.Context, w io.Writer, client *span
 
 		// Transfer the marketing budget from one album to another. By keeping the actions
 		// in a single transaction, it ensures the movement is atomic.
+		// 送金額
 		const transferAmt = 200000
+		// AlbumID: 2 / SingerID: 2のレコードのbudgetを取得
 		album2Budget, err := getBudget(2, 2)
 		if err != nil {
 			return err
@@ -546,14 +552,18 @@ func writeWithTransactionUsingDML(ctx context.Context, w io.Writer, client *span
 		// The transaction will only be committed if this condition still holds at the time
 		// of commit. Otherwise it will be aborted and the callable will be rerun by the
 		// client library.
+		// 予算が送金額より多ければ
 		if album2Budget >= transferAmt {
+			// AlbumID: 1 / SingerID: 1のレコードのbudgetを取得
 			album1Budget, err := getBudget(1, 1)
 			if err != nil {
 				return err
 			}
+			// AlbumID: 1 / SingerID: 1のレコードのbudgetに送金額を増加して更新
 			if err = updateBudget(1, 1, album1Budget+transferAmt); err != nil {
 				return err
 			}
+			// AlbumID: 2 / SingerID: 2のレコードのbudgetに送金額を減少して更新
 			if err = updateBudget(2, 2, album2Budget-transferAmt); err != nil {
 				return err
 			}

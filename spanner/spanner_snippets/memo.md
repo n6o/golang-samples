@@ -10,8 +10,8 @@
 - [x] read data with storing index
 - [x] read only transaction
 - [x] DML getting started insert
-- [ ] query with parameter
-- [ ] DML getting started update
+- [x] query with parameter
+- [x] DML getting started update
 
 ## メモ
 
