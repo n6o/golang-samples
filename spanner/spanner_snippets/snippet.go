@@ -459,6 +459,7 @@ func writeUsingDML(ctx context.Context, w io.Writer, client *spanner.Client) err
 				(14, 'Jacqueline', 'Long'),
 				(15, 'Dylan', 'Shaw')`,
 		}
+		// INSERT 文を発行
 		rowCount, err := txn.Update(ctx, stmt)
 		if err != nil {
 			return err
