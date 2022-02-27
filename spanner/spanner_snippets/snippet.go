@@ -401,8 +401,11 @@ func readStoringIndex(ctx context.Context, w io.Writer, client *spanner.Client) 
 
 func readOnlyTransaction(ctx context.Context, w io.Writer, client *spanner.Client) error {
 	ro := client.ReadOnlyTransaction()
+	// ちゃんとトランザクションはクローズしよう
 	defer ro.Close()
+
 	stmt := spanner.Statement{SQL: `SELECT SingerId, AlbumId, AlbumTitle FROM Albums`}
+	// Query と下でやってる Read はなにか違うのだろうか
 	iter := ro.Query(ctx, stmt)
 	defer iter.Stop()
 	for {
@@ -422,6 +425,7 @@ func readOnlyTransaction(ctx context.Context, w io.Writer, client *spanner.Clien
 		fmt.Fprintf(w, "%d %d %s\n", singerID, albumID, albumTitle)
 	}
 
+	// 同じ結果がでるのかな？
 	iter = ro.Read(ctx, "Albums", spanner.AllKeys(), []string{"SingerId", "AlbumId", "AlbumTitle"})
 	defer iter.Stop()
 	for {

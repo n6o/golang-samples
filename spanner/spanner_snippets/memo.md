@@ -8,7 +8,7 @@
 - [x] read data with index
 - [x] create storing index
 - [x] read data with storing index
-- [ ] read only transaction
+- [x] read only transaction
 - [ ] DML getting started insert
 - [ ] query with parameter
 - [ ] DML getting started update
