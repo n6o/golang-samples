@@ -362,8 +362,12 @@ func addStoringIndex(ctx context.Context, w io.Writer, adminClient *database.Dat
 // [START spanner_read_data_with_storing_index]
 
 func readStoringIndex(ctx context.Context, w io.Writer, client *spanner.Client) error {
-	iter := client.Single().ReadUsingIndex(ctx, "Albums", "AlbumsByAlbumTitle2", spanner.AllKeys(),
-		[]string{"AlbumId", "AlbumTitle", "MarketingBudget"})
+	iter := client.Single().ReadUsingIndex(ctx,
+		"Albums",              // table
+		"AlbumsByAlbumTitle2", // index
+		spanner.AllKeys(),     // key set
+		[]string{"AlbumId", "AlbumTitle", "MarketingBudget"}, // columns
+	)
 	defer iter.Stop()
 	for {
 		row, err := iter.Next()
@@ -380,7 +384,11 @@ func readStoringIndex(ctx context.Context, w io.Writer, client *spanner.Client) 
 			return err
 		}
 		budget := "NULL"
+		// 2度目の登場
+		// marketingBudget は NullInt64 型
+		// NullInt64: Nullでないとき Valid = true
 		if marketingBudget.Valid {
+			// NullInt64 は Optional<Integer> みたいなものか
 			budget = strconv.FormatInt(marketingBudget.Int64, 10)
 		}
 		fmt.Fprintf(w, "%d %s %s\n", albumID, albumTitle, budget)
