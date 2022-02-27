@@ -301,8 +301,21 @@ func queryNewColumn(ctx context.Context, w io.Writer, client *spanner.Client) er
 // [START spanner_read_data_with_index]
 
 func readUsingIndex(ctx context.Context, w io.Writer, client *spanner.Client) error {
-	iter := client.Single().ReadUsingIndex(ctx, "Albums", "AlbumsByAlbumTitle", spanner.AllKeys(),
-		[]string{"AlbumId", "AlbumTitle"})
+	// Albums テーブルから
+	// AlbumsByAlbumTitle インデックスを使って
+	// すべてのキーを対象とし
+	// AlbumId と AlbumTitle を取得する
+
+	// keyset について学ばないと
+	// https://cloud.google.com/spanner/docs/reference/rest/v1/KeySet
+
+	iter := client.Single().ReadUsingIndex(
+		ctx,
+		"Albums",                          // table
+		"AlbumsByAlbumTitle",              // index
+		spanner.AllKeys(),                 // key set
+		[]string{"AlbumId", "AlbumTitle"}, // columns
+	)
 	defer iter.Stop()
 	for {
 		row, err := iter.Next()

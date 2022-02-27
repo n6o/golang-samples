@@ -5,7 +5,7 @@
 - [x] add column
 - [x] update data
 - [x] query data with new column
-- [ ] read data with index
+- [x] read data with index
 - [ ] create storing index
 - [ ] read data with storing index
 - [ ] read only transaction
@@ -16,3 +16,6 @@
 ## メモ
 
 - VSCode を使う場合、 spanner ディレクトリで VSCode を開く
+
+## リポジトリ
+`~/src/github.com/n6o/golang-samples/spanner`
